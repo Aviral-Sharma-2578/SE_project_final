@@ -87,43 +87,38 @@ const page = () => {
   };
 
   useEffect(() => {
-    const fetchMachineDetailsForCurrentItems = async () => {
-      if (!selectedPerson) return;
-      const updatedMachineDetailsArray = await Promise.all(
-        selectedPerson.current.map(async (item) => {
-          const machineDetails = await handleGetIssueDetails(item.issue_id);
-          return {
-            itemId: item.issue_id,
-            machineDetails: machineDetails,
-          };
+    const fetchMachineDetails = async (items, setter) => {
+      const details = await Promise.all(
+        items.map(async (item) => {
+          try {
+            const machineDetails = await handleGetIssueDetails(item.issue_id);
+            return {
+              itemId: item.issue_id,
+              machineDetails: machineDetails,
+            };
+          } catch (error) {
+            console.error(
+              "Error fetching machine details for item:",
+              item,
+              error
+            );
+            return null; // or handle error differently
+          }
         })
       );
-      console.log(updatedMachineDetailsArray);
-      setMachineDetailsArray(updatedMachineDetailsArray);
-      console.log(machineDetailsArray);
-    };
-    const fetchMachineDetailsForCompletedItems = async () => {
-      if (!selectedPerson) return;
-      const updatedCompletedMachineDetailsArray = await Promise.all(
-        selectedPerson.completed.map(async (item) => {
-          const machineDetails = await handleGetIssueDetails(item.issue_id);
-          return {
-            itemId: item.issue_id,
-            machineDetails: machineDetails,
-          };
-        })
-      );
-      console.log(updatedCompletedMachineDetailsArray);
-      setcompletedMachineDetailsArray(updatedCompletedMachineDetailsArray);
-      console.log(completedMachineDetailsArray);
+      setter(details.filter(Boolean)); // This will exclude any null values
     };
 
-    fetchMachineDetailsForCurrentItems().catch((error) => {
-      console.error("Error fetching machine details:", error);
-    });
-    fetchMachineDetailsForCompletedItems().catch((error) => {
-      console.error("Error fetching machine details:", error);
-    });
+    if (selectedPerson) {
+      fetchMachineDetails(selectedPerson.current, setMachineDetailsArray).catch(
+        console.error
+      );
+
+      fetchMachineDetails(
+        selectedPerson.completed,
+        setcompletedMachineDetailsArray
+      ).catch(console.error);
+    }
   }, [selectedPerson]);
 
   useEffect(() => {
@@ -170,48 +165,38 @@ const page = () => {
     router.refresh();
   };
 
-  const handleGetIssueDetails = async (issueId) => {
+  async function handleGetIssueDetails(issueId) {
+    // PART-1: Fetch issue details
     const res = await fetch(`/api/Issues/${issueId}`, {
       method: "GET",
     });
     const data = await res.json();
-    const machine_id = data.foundIssue.machine_id;
-    console.log(data.foundIssue.is_returnable);
-    //console.log(machine_id);
-    console.log(data.foundIssue.due_date);
-    const res2 = await fetch(`/api/machine/${machine_id}`, {
-      method: "GET",
-    });
-    const data2 = await res2.json();
-    console.log(data2.foundMachine.machine_name);
-    const res3 = await fetch(`/api/inventory/${machine_id}`, {
-      method: "GET",
-    });
-    const data3 = await res3.json();
-    console.log(data3.foundInventory.inventory_name);
-    return {
-      machineName: data2.foundMachine.machine_name,
-      inventoryName: data3.foundInventory.inventory_name,
-      is_returnable: data.foundIssue.is_returnable,
-    };
-    if (res.ok) {
+
+    // Check if the response contains the necessary data
+    if (!data || !data.foundIssue || !data.foundIssue.machine_id) {
+      throw new Error(
+        "The response from /api/Issues does not contain the expected data."
+      );
     }
-    router.refresh();
-  };
 
-  const fetchMachineDetailsForCurrentItems = async () => {
-    const machineDetailsPromises = selectedPerson.current.map(async (item) => {
-      const machineDetails = await handleGetIssueDetails(item.issue_id);
-      console.log(machineDetails);
-      return {
-        itemId: item.issue_id,
-        machineDetails: machineDetails,
-      };
+    // PART-2: Fetch machine details using the machine_id from PART-1
+    const machine_id = data.foundIssue.machine_id;
+    const machineResponse = await fetch(`/api/machine/${machine_id}`, {
+      method: "GET",
     });
+    const machineData = await machineResponse.json();
+    const inventoryResponse = await fetch(`/api/inventory/${machine_id}`, {
+      method: "GET",
+    });
+    const inventoryData = await inventoryResponse.json();
 
-    // Wait for all promises to resolve
-    return await Promise.all(machineDetailsPromises);
-  };
+    // Return the combined data
+    return {
+      machineName: machineData.foundMachine.machine_name,
+      is_returnable: data.foundIssue.is_returnable,
+      due_date: data.foundIssue.due_date,
+    };
+  }
 
   return (
     <>
@@ -368,8 +353,8 @@ const page = () => {
                             ? "Non-Consumable"
                             : "Consumable"}
                         </td>
-                        <td className="px-3 py-4 ">
-                          <div className="flex justify-start gap-2">
+                        <td className="py-4 ">
+                          <div className="flex justify-start">
                             {item.machineDetails.is_returnable ? (
                               <Button
                                 onClick={() =>
@@ -397,78 +382,9 @@ const page = () => {
                     ))}
                 </tbody>
               </table>
-              <Divider/>
-              <Typography variant="body2">Current Items:</Typography>
-              <table className="w-full border-collapse bg-white text-left text-sm text-gray-500">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-4 font-medium text-gray-900"
-                    >
-                      Machine Name
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-4 font-medium text-gray-900"
-                    >
-                      Type
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-4 font-medium text-gray-900"
-                    >
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y divide-gray-100 border-t border-gray-100">
-                  {machineDetailsArray &&
-                    machineDetailsArray.map((item, index) => (
-                      <tr className="hover:bg-gray-50">
-                        <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
-                          <div class="text-sm">
-                            <div className="font-medium text-gray-700">
-                              {item.machineDetails.inventoryName}
-                            </div>
-                          </div>
-                        </th>
-                        <td className="px-6 py-4">
-                          {item.machineDetails.is_returnable
-                            ? "Non-Consumable"
-                            : "Consumable"}
-                        </td>
-                        <td className="px-3 py-4 ">
-                          <div className="flex justify-start gap-2">
-                            {item.machineDetails.is_returnable ? (
-                              <Button
-                                onClick={() =>
-                                  handleEmailSend(selectedPersonId, item.itemId)
-                                }
-                              >
-                                <EmailIcon />
-                              </Button>
-                            ) : (
-                              <span></span>
-                            )}
-                            <Button
-                              onClick={() =>
-                                handleCurrentIssue(
-                                  selectedPersonId,
-                                  item.itemId
-                                )
-                              }
-                            >
-                              <DeleteIcon />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-              <Divider/>
+              <br />
+              <Divider />
+              <br />
               <Typography variant="body2">Completed Items:</Typography>
               <ul>
                 {completedMachineDetailsArray &&
