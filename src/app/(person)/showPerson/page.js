@@ -185,10 +185,6 @@ const page = () => {
       method: "GET",
     });
     const machineData = await machineResponse.json();
-    const inventoryResponse = await fetch(`/api/inventory/${machine_id}`, {
-      method: "GET",
-    });
-    const inventoryData = await inventoryResponse.json();
 
     // Return the combined data
     return {
