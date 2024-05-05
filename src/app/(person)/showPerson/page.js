@@ -160,9 +160,8 @@ const page = () => {
       method: "PUT",
       body: JSON.stringify(formData),
     });
-    if (res.ok) {
-    }
     router.refresh();
+    router.push("/dashboard");
   };
 
   async function handleGetIssueDetails(issueId) {
@@ -353,9 +352,13 @@ const page = () => {
                           <div className="flex justify-start">
                             {item.machineDetails.is_returnable ? (
                               <Button
-                                onClick={() =>
-                                  handleEmailSend(selectedPersonId, item.itemId)
-                                }
+                                onClick={() => {
+                                  handlePopupClose();
+                                  handleEmailSend(
+                                    selectedPersonId,
+                                    item.itemId
+                                  );
+                                }}
                               >
                                 <EmailIcon />
                               </Button>
@@ -363,12 +366,13 @@ const page = () => {
                               <span></span>
                             )}
                             <Button
-                              onClick={() =>
+                              onClick={() => {
+                                handlePopupClose();
                                 handleCurrentIssue(
                                   selectedPersonId,
                                   item.itemId
-                                )
-                              }
+                                );
+                              }}
                             >
                               <DeleteIcon />
                             </Button>
