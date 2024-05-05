@@ -3,15 +3,15 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-const getMachineById = async (id) => {
+const getInventoryById = async (id) => {
   try {
     console.log("going in");
-    const res = await fetch(`/api/machine/${id}`, {
+    const res = await fetch(`/api/inventory/${id}`, {
       cache: "no-store",
     });
 
     if (!res.ok) {
-      throw new Error("Failed to fetch machine");
+      throw new Error("Failed to fetch inventory");
     }
 
     return res.json();
@@ -21,13 +21,13 @@ const getMachineById = async (id) => {
 };
 
 const page = async ({ params }) => {
-  let machineData = await getMachineById(params.id);
-  machineData = machineData.foundMachine;
-  let orders = machineData.orders;
+  let inventoryData = await getInventoryById(params.id);
+  inventoryData = inventoryData.foundInventory;
+  let orders = inventoryData.orders;
   if (!orders) {
     return <p>No orders.</p>;
   }
-  console.log(machineData);
+  console.log(inventoryData);
   return (
     <>
       {/* purchase_date: "",
@@ -38,7 +38,7 @@ const page = async ({ params }) => {
     vendor: "", */}
 
       <div>
-        <Link className="m-5" href={`/createOrder/${params.id}`}>
+        <Link className="m-5" href={`/createOrderInventory/${params.id}`}>
           <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded inline-flex items-center">
             <svg
               class="fill-current w-4 h-4 mr-2"
@@ -94,7 +94,6 @@ const page = async ({ params }) => {
                   <td className="px-6 py-4">{order.build_number}</td>
                   <td className="px-6 py-4">{order.quantity}</td>
                   <td className="px-6 py-4">{order.vendor}</td>
-
                 </tr>
               ))}
             </tbody>

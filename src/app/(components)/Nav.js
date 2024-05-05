@@ -33,7 +33,7 @@ const Nav = () => {
     //     Home
     //   </Link>
     //   <Link href="/createIssue" className="bg-blue-400 p-2">
-    //     Create Issue
+    //     Issue Machine
     //   </Link>
     //   <Link href="/inuse" className="bg-blue-400 p-2">
     //     Inuse
@@ -117,8 +117,8 @@ const Nav = () => {
               </ListItemButton>
             </Link>
           </ListItem>
-          <ListItem key={"Create Issue"} disablePadding>
-            <Link href="/inventory">
+          <ListItem key={"Issue Machine"} disablePadding>
+            <Link href="/showInventory">
               <ListItemButton>
                 <ListItemIcon>
                   <AddCardIcon className="text-indigo-500 text-2xl" />
@@ -158,20 +158,32 @@ const Nav = () => {
               </ListItemButton>
             </Link>
           </ListItem>
-          <ListItem key={"Create Issue"} disablePadding>
+          <ListItem key={"Issue Machine"} disablePadding>
             <Link href="/createIssue">
               <ListItemButton>
                 <ListItemIcon>
                   <AddCardIcon className="text-indigo-500 text-2xl" />
                 </ListItemIcon>
                 <Typography variant="h7" className="text-lg font-semibold">
-                  Create Issue
+                  Issue Machine
                 </Typography>
               </ListItemButton>
             </Link>
           </ListItem>
-          <ListItem key={"Create Issue"} disablePadding>
-            <Link href="/addinventory">
+          <ListItem key={"Issue Item"} disablePadding>
+            <Link href="/createIssueInventory">
+              <ListItemButton>
+                <ListItemIcon>
+                  <AddCardIcon className="text-indigo-500 text-2xl" />
+                </ListItemIcon>
+                <Typography variant="h7" className="text-lg font-semibold">
+                  Issue Item
+                </Typography>
+              </ListItemButton>
+            </Link>
+          </ListItem>
+          <ListItem key={"Issue Machine"} disablePadding>
+            <Link href="/addInventory">
               <ListItemButton>
                 <ListItemIcon>
                   <AddCardIcon className="text-indigo-500 text-2xl" />
@@ -183,7 +195,7 @@ const Nav = () => {
             </Link>
           </ListItem>
           <Divider />
-          <ListItem key={"Create Issue"} disablePadding>
+          <ListItem key={"Issue Machine"} disablePadding>
             <Link href="/pdf">
               <ListItemButton>
                 <ListItemIcon>

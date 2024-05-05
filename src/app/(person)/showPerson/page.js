@@ -19,6 +19,7 @@ import {
   IconButton,
   Typography,
   CloseIcon,
+  Divider,
 } from "@mui/material";
 
 const page = () => {
@@ -183,8 +184,14 @@ const page = () => {
     });
     const data2 = await res2.json();
     console.log(data2.foundMachine.machine_name);
+    const res3 = await fetch(`/api/inventory/${machine_id}`, {
+      method: "GET",
+    });
+    const data3 = await res3.json();
+    console.log(data3.foundInventory.inventory_name);
     return {
       machineName: data2.foundMachine.machine_name,
+      inventoryName: data3.foundInventory.inventory_name,
       is_returnable: data.foundIssue.is_returnable,
     };
     if (res.ok) {
@@ -208,172 +215,279 @@ const page = () => {
 
   return (
     <>
-    <RequireAuth>
-      <div className="mb-2 mt-4">
-        <input
-          type="text"
-          placeholder="Search By Name ,Email.. "
-          value={searchText}
-          onChange={handleSearchChange}
-          className="w-80 px-4 py-2 ml-5  border border-gray-600 rounded-md focus:outline-none focus:border-blue-500"
-        />
-        <select
-          value={selectedCategory}
-          onChange={handleCategoryChange}
-          className="ml-4 px-4 py-2 border border-gray-600 rounded-md focus:outline-none focus:border-blue-500"
-        >
-          <option value="">Select Category</option>
-          <option value="ug">Undergraduate</option>
-          <option value="pg">Postgraduate</option>
-          <option value="phd">PHD</option>
-          <option value="prof">Professor</option>
-          <option value="other">Others</option>
-        </select>
-      </div>
+      <RequireAuth>
+        <div className="mb-2 mt-4">
+          <input
+            type="text"
+            placeholder="Search By Name ,Email.. "
+            value={searchText}
+            onChange={handleSearchChange}
+            className="w-80 px-4 py-2 ml-5  border border-gray-600 rounded-md focus:outline-none focus:border-blue-500"
+          />
+          <select
+            value={selectedCategory}
+            onChange={handleCategoryChange}
+            className="ml-4 px-4 py-2 border border-gray-600 rounded-md focus:outline-none focus:border-blue-500"
+          >
+            <option value="">Select Category</option>
+            <option value="ug">Undergraduate</option>
+            <option value="pg">Postgraduate</option>
+            <option value="phd">PHD</option>
+            <option value="prof">Professor</option>
+            <option value="other">Others</option>
+          </select>
+        </div>
 
-      <div className="overflow-hidden h-screen rounded-lg border border-gray-200 shadow-md m-5 mt-2">
-        <table className="w-full border-collapse bg-white text-left text-sm text-gray-500">
-          <thead className="bg-gray-50">
-            <tr>
-              <th scope="col" className="px-6 py-4 font-medium text-gray-900">
-                Name
-              </th>
-              <th scope="col" className="px-6 py-4 font-medium text-gray-900">
-                Current_Status
-              </th>
-              <th scope="col" className="px-6 py-4 font-medium text-gray-900">
-                Mobile No
-              </th>
-              <th scope="col" className="px-6 py-4 font-medium text-gray-900">
-                Actions
-              </th>
-            </tr>
-          </thead>
+        <div className="overflow-hidden h-screen rounded-lg border border-gray-200 shadow-md m-5 mt-2">
+          <table className="w-full border-collapse bg-white text-left text-sm text-gray-500">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                  Name
+                </th>
+                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                  Current_Status
+                </th>
+                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                  Mobile No
+                </th>
+                <th scope="col" className="px-6 py-4 font-medium text-gray-900">
+                  Actions
+                </th>
+              </tr>
+            </thead>
 
-          <tbody className="divide-y divide-gray-100 border-t border-gray-100">
-            {searchResults.length > 0 ? (
-              searchResults.map((person, personIndex) => (
-                <tr className="hover:bg-gray-50" key={person._id}>
-                  <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
-                    <div class="text-sm">
-                      <div className="font-medium text-gray-700">
-                        {person.person_name}
+            <tbody className="divide-y divide-gray-100 border-t border-gray-100">
+              {searchResults.length > 0 ? (
+                searchResults.map((person, personIndex) => (
+                  <tr className="hover:bg-gray-50" key={person._id}>
+                    <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
+                      <div class="text-sm">
+                        <div className="font-medium text-gray-700">
+                          {person.person_name}
+                        </div>
+                        <div className="text-gray-400">{person.email_id}</div>
                       </div>
-                      <div className="text-gray-400">{person.email_id}</div>
-                    </div>
-                  </th>
-                  <td className="px-6 py-4">
-                    {person.current.length > 0 ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-1 text-xs font-semibold text-orange-600">
-                        <span className="h-1.5 w-1.5 rounded-full bg-orange-600"></span>
-                        Pending
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-1 text-xs font-semibold text-green-600">
-                        <span className="h-1.5 w-1.5 rounded-full bg-green-600"></span>
-                        Cleared
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">{person.mobile_number}</td>
-                  <td className="px-3 py-4 ">
-                    <div className="flex justify-start gap-4">
-                      <Link href={`/deletePerson/${person._id}`}>
-                        <DeleteIcon></DeleteIcon>
-                      </Link>
-                      <Link
-                        x-data="{ tooltip: 'Edite' }"
-                        href={`/updatePerson/${person._id}`}
-                      >
-                        <EditIcon></EditIcon>
-                      </Link>
-                      <button onClick={() => handlePopupOpen(person)}>
-                        <HistoryIcon> </HistoryIcon>
-                      </button>
+                    </th>
+                    <td className="px-6 py-4">
+                      {person.current.length > 0 ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-1 text-xs font-semibold text-orange-600">
+                          <span className="h-1.5 w-1.5 rounded-full bg-orange-600"></span>
+                          Pending
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-1 text-xs font-semibold text-green-600">
+                          <span className="h-1.5 w-1.5 rounded-full bg-green-600"></span>
+                          Cleared
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">{person.mobile_number}</td>
+                    <td className="px-3 py-4 ">
+                      <div className="flex justify-start gap-4">
+                        <Link href={`/deletePerson/${person._id}`}>
+                          <DeleteIcon></DeleteIcon>
+                        </Link>
+                        <Link
+                          x-data="{ tooltip: 'Edite' }"
+                          href={`/updatePerson/${person._id}`}
+                        >
+                          <EditIcon></EditIcon>
+                        </Link>
+                        <button onClick={() => handlePopupOpen(person)}>
+                          <HistoryIcon> </HistoryIcon>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="py-4">
+                    <div className="flex justify-center items-center h-full mt-8 text-lg">
+                      No Result Found
                     </div>
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="py-4">
-                  <div className="flex justify-center items-center h-full mt-8 text-lg">
-                    No Result Found
-                  </div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
 
-        <Dialog
-          open={openPopup}
-          onClose={handlePopupOpen}
-          maxWidth="md"
-          fullWidth
-        >
-          <DialogTitle>
-            {selectedPerson && selectedPerson.person_name}'s Details
-            <IconButton
-              onClick={handlePopupClose}
-              aria-label="close"
-            ></IconButton>
-          </DialogTitle>
-          <DialogContent dividers>
-            <Typography variant="body2">Current Items:</Typography>
-            <ul>
-              {machineDetailsArray &&
-                machineDetailsArray.map((item, index) => (
-                  <li key={index}>
-                    <span className="mr-4">
-                      Machine Name: {item.machineDetails.machineName}
-                    </span>
-                    <span className="mx-4">
-                      Returnable:{" "}
-                      {item.machineDetails.is_returnable ? "Yes" : "No"}
-                    </span>
-                    {item.machineDetails.is_returnable ? (
-                      <Button
-                        onClick={() =>
-                          handleEmailSend(selectedPersonId, item.itemId)
-                        }
-                      >
-                        <EmailIcon />
-                        Send Warning mail
-                      </Button>
-                    ) : (
-                      <span></span>
-                    )}
-                    <Button
-                      onClick={() =>
-                        handleCurrentIssue(selectedPersonId, item.itemId)
-                      }
+          <Dialog
+            open={openPopup}
+            onClose={handlePopupOpen}
+            maxWidth="md"
+            fullWidth
+          >
+            <DialogTitle>
+              {selectedPerson && selectedPerson.person_name}'s Details
+              <IconButton
+                onClick={handlePopupClose}
+                aria-label="close"
+              ></IconButton>
+            </DialogTitle>
+            <DialogContent dividers>
+              <Typography variant="body2">Current Issued Machines:</Typography>
+              <table className="w-full border-collapse bg-white text-left text-sm text-gray-500">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th
+                      scope="col"
+                      className="px-6 py-4 font-medium text-gray-900"
                     >
-                      <DeleteIcon />
-                      Remove
-                    </Button>
-                  </li>
-                ))}
-            </ul>
-            <Typography variant="body2">Completed Items:</Typography>
-            <ul>
-              {completedMachineDetailsArray &&
-                completedMachineDetailsArray.map((item, index) => (
-                  <li key={index}>
-                    <span className="mr-4">
-                      Machine Name: {item.machineDetails.machineName}
-                    </span>
-                  </li>
-                ))}
-            </ul>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handlePopupClose} color="primary">
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
+                      Machine Name
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-4 font-medium text-gray-900"
+                    >
+                      Type
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-4 font-medium text-gray-900"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody className="divide-y divide-gray-100 border-t border-gray-100">
+                  {machineDetailsArray &&
+                    machineDetailsArray.map((item, index) => (
+                      <tr className="hover:bg-gray-50">
+                        <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
+                          <div class="text-sm">
+                            <div className="font-medium text-gray-700">
+                              {item.machineDetails.machineName}
+                            </div>
+                          </div>
+                        </th>
+                        <td className="px-6 py-4">
+                          {item.machineDetails.is_returnable
+                            ? "Non-Consumable"
+                            : "Consumable"}
+                        </td>
+                        <td className="px-3 py-4 ">
+                          <div className="flex justify-start gap-2">
+                            {item.machineDetails.is_returnable ? (
+                              <Button
+                                onClick={() =>
+                                  handleEmailSend(selectedPersonId, item.itemId)
+                                }
+                              >
+                                <EmailIcon />
+                              </Button>
+                            ) : (
+                              <span></span>
+                            )}
+                            <Button
+                              onClick={() =>
+                                handleCurrentIssue(
+                                  selectedPersonId,
+                                  item.itemId
+                                )
+                              }
+                            >
+                              <DeleteIcon />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+              <Divider/>
+              <Typography variant="body2">Current Items:</Typography>
+              <table className="w-full border-collapse bg-white text-left text-sm text-gray-500">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th
+                      scope="col"
+                      className="px-6 py-4 font-medium text-gray-900"
+                    >
+                      Machine Name
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-4 font-medium text-gray-900"
+                    >
+                      Type
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-4 font-medium text-gray-900"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody className="divide-y divide-gray-100 border-t border-gray-100">
+                  {machineDetailsArray &&
+                    machineDetailsArray.map((item, index) => (
+                      <tr className="hover:bg-gray-50">
+                        <th className="flex gap-3 px-6 py-4 font-normal text-gray-900">
+                          <div class="text-sm">
+                            <div className="font-medium text-gray-700">
+                              {item.machineDetails.inventoryName}
+                            </div>
+                          </div>
+                        </th>
+                        <td className="px-6 py-4">
+                          {item.machineDetails.is_returnable
+                            ? "Non-Consumable"
+                            : "Consumable"}
+                        </td>
+                        <td className="px-3 py-4 ">
+                          <div className="flex justify-start gap-2">
+                            {item.machineDetails.is_returnable ? (
+                              <Button
+                                onClick={() =>
+                                  handleEmailSend(selectedPersonId, item.itemId)
+                                }
+                              >
+                                <EmailIcon />
+                              </Button>
+                            ) : (
+                              <span></span>
+                            )}
+                            <Button
+                              onClick={() =>
+                                handleCurrentIssue(
+                                  selectedPersonId,
+                                  item.itemId
+                                )
+                              }
+                            >
+                              <DeleteIcon />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+              <Divider/>
+              <Typography variant="body2">Completed Items:</Typography>
+              <ul>
+                {completedMachineDetailsArray &&
+                  completedMachineDetailsArray.map((item, index) => (
+                    <li key={index}>
+                      <span className="mr-4">
+                        Machine Name: {item.machineDetails.machineName}
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handlePopupClose} color="primary">
+                Close
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </div>
       </RequireAuth>
     </>
   );

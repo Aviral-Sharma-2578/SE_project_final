@@ -203,7 +203,7 @@ const MachineForm = () => {
                     className="block text-s font-semibold"
                     htmlFor="machine_id"
                   >
-                    Category
+                    Select Category:
                   </label>
                   <select
                     className="w-full mt-1 py-2 px-3 border border-gray-300 bg-white rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
