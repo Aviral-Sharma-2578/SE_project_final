@@ -85,7 +85,7 @@ const MachineForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    formData.available_quantity = formData.total_quantity;
     const res = await fetch("/api/machine", {
       method: "POST",
       body: JSON.stringify({ formData }),
@@ -175,23 +175,6 @@ const MachineForm = () => {
                       type="number"
                       name="total_quantity"
                       value={formData.total_quantity}
-                      onChange={handleChange}
-                      min={0}
-                      required
-                      className="w-full ml-0 pl-1 pr-3 py-1 rounded-lg border-2 border-gray-300 outline-none focus:border-indigo-500"
-                    />
-                  </div>
-                  <div className="w-1/2 px-3 mb-5">
-                    <label
-                      htmlFor="available_quantity"
-                      className="text-s font-semibold px-1"
-                    >
-                      Available Quantity:
-                    </label>
-                    <input
-                      type="number"
-                      name="available_quantity"
-                      value={formData.available_quantity}
                       onChange={handleChange}
                       min={0}
                       required
