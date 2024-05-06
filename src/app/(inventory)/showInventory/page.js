@@ -45,10 +45,17 @@ function YourComponent() {
         item.inventory_name.toLowerCase().includes(lowercaseSearchText)
       );
     }
+    console.log(newData);
     if (category) {
-      newData = newData.filter((item) => item.category === category);
+      newData = newData.filter((item) => {
+        console.log(category);
+        console.log(item.category);
+        return (
+          item.category.trim().toLowerCase() === category.trim().toLowerCase()
+        );
+      });
     }
-
+    console.log(newData);
     return newData;
   };
 
@@ -75,8 +82,8 @@ function YourComponent() {
           className="ml-4 px-4 py-2 border border-gray-600 rounded-md focus:outline-none focus:border-blue-500"
         >
           <option value="">Select Category</option>
-          <option value="consumable">Consuamble</option>
-          <option value="non-consuamble"> Non-Consuamble</option>
+          <option value="Consumable">Consumable</option>
+          <option value="Non-Consumable"> Non-Consumable</option>
         </select>
       </div>
       <div className="overflow-hidden h-screen rounded-lg border border-gray-200 shadow-md m-5 mt-2">
@@ -143,17 +150,16 @@ function YourComponent() {
                       }`}
                     >
                       {inventory.available_quantity}
-                       
                     </span>
-                  </td><td
+                  </td>
+                  <td
                     className="px-6 py-4 font-medium text-gray-900"
                     // rowSpan={flattenSubparts(inventory.subparts).length}
                   >
                     <span
                       className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold`}
                     >
-                      {inventory.total_quantity- inventory.available_quantity}
-                       
+                      {inventory.total_quantity - inventory.available_quantity}
                     </span>
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900">

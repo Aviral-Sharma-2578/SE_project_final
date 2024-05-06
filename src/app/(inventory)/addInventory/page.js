@@ -197,8 +197,8 @@ const InventoryForm = () => {
                   onChange={handleChange}
                 >
                   <option value="">Select Category</option>
-                  <option value="consumable">consumable</option>
-                  <option value="non-consumable">Non-consumable</option>
+                  <option value="Consumable">Consumable</option>
+                  <option value="Non-Consumable">Non-Consumable</option>
                 </select>
               </div>
               <div className="form-group">
